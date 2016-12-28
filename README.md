@@ -11,11 +11,13 @@ Clone, install the dependencies and start the server.
 
 $ npm install
 $ bower install
---start dev
+
+###--start dev
 
 $ gulp
 $ node debug.js 
---or for production
+
+###--or for production
 
 $ node release.js
 ```
@@ -23,3 +25,11 @@ $ node release.js
 Done
 
 
+
+### Admin
+```sh
+/$manager/login
+
+user: admin
+password: password
+```
