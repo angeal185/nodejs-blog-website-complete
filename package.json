@@ -1,0 +1,20 @@
+{
+  "name": "Blogwebsite",
+  "description": "blog node.js.",
+  "version": "1.0.0",
+  "main": "release.js",
+  "dependencies": {
+    "gulp-stylus": "^2.6.0",
+    "marked": "latest",
+    "total.js": "latest"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "blog",
+    "engine"
+  ],
+  "author": "ben eaves",
+  "license": "MIT"
+}

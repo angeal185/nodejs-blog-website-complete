@@ -1,0 +1,34 @@
+{
+  "name": "nodejs-blog",
+  "description": "node.js blogging website",
+  "main": "release.js",
+  "authors": [
+    "ben eaves"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "nodejs",
+    "blog",
+    "stylus",
+    "bootstrap",
+    "jquery",
+    "totaljs"
+  ],
+  "homepage": "angeal185.github.io",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "3.1.1",
+    "wow": "wowjs#^1.1.2",
+    "font-awesome-stylus": "^4.7.0",
+    "bootstrap-stylus": "^5.0.7",
+    "magnific-popup": "^1.1.0",
+    "hover": "Hover#^2.1.0"
+  }
+}
