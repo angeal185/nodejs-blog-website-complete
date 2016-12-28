@@ -1,5 +1,5 @@
 # nodejs-blog-website-complete
-node js blog created with total.js, jquery, bootstrap and stylus 
+node js blog created with total.js, nosql, stylus, jquery and bootstrap
 
 ### Installation
 
