@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=10" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="robots" content="all,follow" />
+	<link rel="alternate" type="application/rss+xml" title="@{config.description}" href="/rss/" />
+	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700&subset=latin,latin-ext" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+	@{import('meta', 'head', 'animate.css', 'loader.css', 'style.css', 'font-awesome.css', 'font-icons.css', 'dark.css', 'magnific-popup.css', 'responsive.css', 'default.css', 'hover-min.css', 'jquery.min.js', 'plugins.js', 'default.js', 'favicon.ico')}
+</head>
+<body class="animated-3 fadeIn">
+@{view('partials/loader')}
+<div data-component="cookie" class="hidden">@(This site uses cookies for visitor statistics. By continuing to browse the site you are agreeing to our use of cookies.) <a href="/privacy/">@(Privacy Policy)</a></div>
+<div data-component="message" data-button="@(Close)"></div>
+<div class="content">@{view('partials/menu', null, '1 minute', 'partials/menu')}<div class="row ">@{body}</div></div>
+@{view('partials/footer')}
+<div id="gotoTop" class="icon-angle-up"></div>
+<div class="col-md3 alert alert-success wow bounceIn" style="bottom:50px; left:50px" ><strong>@{title}</strong> </div>
+@{import( 'app.js', 'scripts.js')}
+<script>
+window.addEventListener('load', function () {
+	$('.alert-success').fadeOut(5000);
+
+$('#loader').delay(5000).queue(function (next) { 
+	$(this).css('display', 'none');
+	});
+	}, false);
+$('.nobg, .tag, .tagcloud a').attr('class','hvr-buzz');
+$('h4, b').attr('class','hvr-underline-from-left');
+@{section('script')}
+</script>
+</body>
+</html>

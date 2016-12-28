@@ -1,0 +1,24 @@
+@{title('Portfolio-project')}
+@{sitemap('portfolio-project')}
+<section id="content">
+	<div class="content-wrap">
+		<div class="container clearfix">
+			<div class="col_two_third portfolio-single-image nobottommargin">
+				<div class="fslider" data-arrows="false" data-thumbs="true" data-animation="fade">
+					<div class="flexslider">
+					<h2>Project Title:</h2>
+						<div class="slider-wrap">
+						@{view('portfolio/project-001-l')}	
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col_one_third portfolio-single-content col_last nobottommargin">
+				@{view('portfolio/project-001-r')}
+			</div>
+			<div class="clear"></div>
+			<div class="divider divider-center"><i class="icon-circle"></i></div>
+			@{view('portfolio/other-projects')}
+		</div>
+	</div>
+</section>

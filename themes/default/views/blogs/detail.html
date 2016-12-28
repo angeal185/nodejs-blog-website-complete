@@ -1,0 +1,34 @@
+@{meta(model.name, model.perex, model.tags.join(', '))}
+@{sitemap('detail')}
+@{sitemap_replace('category', model.category, model.category_linker, true)}
+@{sitemap_replace('detail', model.name, n => n.format(model.category_linker, model.linker))}
+@{author(model.author)}
+
+<input type="hidden" id="idblock" value="@{model.id}" />
+<div class="content-border col-md-9">
+<div class="markdown">
+	<h2><b>@{model.name}</b></h2>
+	
+	<div><img src="/download/@{model.picture}" class="img-responsive" alt="@{model.name}" /></div>
+	<br />
+	<div class="fs11 silver"><i class="fa fa-clock-o mr5"></i><span class="time">@{model.datecreated}</span></div>
+	@{!model.body}
+	<h6>Author: @{if model.author}@{model.author}@{fi}</h6>
+	<h6> @(Category:) <b>@{model.category}</b></h6>
+</div>
+
+@{if model.comments}
+	<!-- THE COMMENTS WILL BE LOADED WHEN THE BROWSER SCROLL ON THIS POSITION -->
+	<div data-component="lazyload" data-init="init_comments" id="comments"></div>
+	@{section script}
+	<script>
+		// Method is executed only onetime
+		function init_comments() {
+			AJAX('GET /api/comments/{0}/'.format($('#idblock').val()), 'comments');
+			IMPORT("@{'/templates/comments.html'}", '#comments');
+		}
+	</script>
+	@{end}
+@{fi}
+</div>
+@{view('blogs/partial-blog-sidebar')}

@@ -1,0 +1,38 @@
+@{sitemap('gallery')}
+<section id="content">
+	<div class="content-wrap">
+		<div class="container clearfix">
+			<ul id="portfolio-filter" class="portfolio-filter clearfix">
+
+				<li class="activeFilter"><a href="#" data-filter="*">Show All</a></li>
+				<li><a href="#" data-filter=".pf-first">first</a></li>
+				<li><a href="#" data-filter=".pf-second">second</a></li>
+				<li><a href="#" data-filter=".pf-third">third</a></li>
+				<li><a href="#" data-filter=".pf-fourth">fourth</a></li>
+				<li><a href="#" data-filter=".pf-fifth">fifth</a></li>
+
+			</ul>
+			<div class="clear"></div>
+			<div id="demo-gallery" class="masonry-thumbs col-3" data-big="2" data-lightbox="gallery">
+				<a href="/img/portfolio/1/5.jpg" data-lightbox="gallery-item" class="pf-first pf-fourth"><img class="image_fade" src="/img/portfolio/1/5.jpg" alt="Gallery Thumb 1"></a>
+				<a href="/img/portfolio/1/5.jpg" data-lightbox="gallery-item" class="pf-second pf-third"><img class="image_fade" src="/img/portfolio/1/5.jpg" alt="Gallery Thumb 2"></a>
+				<a href="/img/portfolio/1/5.jpg" data-lightbox="gallery-item" class="pf-third pf-fifth"><img class="image_fade" src="/img/portfolio/1/5.jpg" alt="Gallery Thumb 3"></a>
+				<a href="/img/portfolio/1/5.jpg" data-lightbox="gallery-item" class="pf-fourth pf-second"><img class="image_fade" src="/img/portfolio/1/5.jpg" alt="Gallery Thumb 4"></a>
+				<a href="/img/portfolio/1/5.jpg" data-lightbox="gallery-item" class="pf-fifth"><img class="image_fade" src="/img/portfolio/1/5.jpg" alt="Gallery Thumb 5"></a>
+				<a href="/img/portfolio/1/5.jpg" data-lightbox="gallery-item" class="pf-first pf-third"><img class="image_fade" src="/img/portfolio/1/5.jpg" alt="Gallery Thumb 6"></a>
+			</div>
+		</div>
+	</div>
+</section>
+<script type="text/javascript">
+	jQuery(window).load(function(){
+		var $container = $('#demo-gallery');
+		$('#portfolio-filter a').click(function(){
+			$('#portfolio-filter li').removeClass('activeFilter');
+			$(this).parent('li').addClass('activeFilter');
+			var selector = $(this).attr('data-filter');
+			$container.isotope({ filter: selector });
+			return false;
+		});
+	});
+</script>

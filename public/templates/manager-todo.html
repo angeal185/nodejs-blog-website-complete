@@ -1,0 +1,286 @@
+<div class="filter">
+	<div class="container">
+
+		<div class="caption"><span class="fa fa-pencil mr5"></span> @(Todo)</div>
+		
+		<div class="caption" style="margin-left:50px"><a href="javascript:void(0)" data-component="click" data-component-path="todo_new" ><i class="fa fa-plus-circle mr5"></i></a> @(Add Todo)</div>
+		<div class="row">
+			<div class="col-md-4 col-sm-6 m">
+				<div data-component="textbox" data-component-path="todo.filter.search" data-placeholder="@(Search todo ...)" data-control-icon="fa-search"></div>
+				<div class="help" data-component="template" data-component-path="todo.grid"><script type="text/html">{{ count | pluralize(@('# items','# item','# items','# items')) }} / {{ pages | pluralize(@('# pages','# page','# pages','# pages')) }}</script></div>
+			</div>
+			<div class="col-md-4 col-sm-6 m">
+				<div data-component="dropdown" data-component-path="todo.filter.tag" data-source="todo.tags" data-empty="@(All tags)" data-source-value="linker"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<div data-component="grid" data-component-path="todo.grid" data-pagination-path="todo.filter.page" data-component-id="todo.grid" data-max="auto" data-page="@(Page: #)" data-pages="@(# pages,# page,# pages,# pages)" data-items="@(# items,# item,# items,# items)" data-empty="@(Database does not contain any data.)">
+		<script type="text/html">
+		<tr class="" style="height:100px; font-size:24px">
+			<td style=" padding-left:25px">{{ if picture }}<span class="fa fa-photo mr5"></span>{{ fi }}{{ if language }}<span class="fs11 silver mr5">{{ language }}</span>{{ fi }}{{ if draft }}<span class="badge badge-red mr5">@(draft)</span>{{ fi }}{{ name }}</td>
+			<td style="width:60px" class="fs11 hidden-xs ui-right"><span class="todo-stats" data-id="{{ id }}">...</span><span class="fa fa-eye ml5"></span></td>
+			<td style="width:200px" class="silver ui-right hidden-xs">{{ datecreated | format('@(yyyy-MM-dd)') }}</td>
+			<td style="width:80px;  padding-right:25px" class="ui-right">
+				<button name="edit" title="@(Edit)"><span class="fa fa-pencil"></span></button>
+				<button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button>
+			</td>
+		</tr>
+		</script>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(Todo form)" data-component-path="common.form" data-if="value === 'todo'" data-width="980px" data-component-id="todo.form" data-autocenter="false">
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-12">
+				<div data-component="textbox" data-component-path="todo.form.name" data-required="true">@(Name)</div>
+				<div class="help"><i class="fa fa-lightbulb-o"></i>@(Use shorter name for your todo.)</div>
+			</div>
+		</div>
+	</div>
+	<div class="padding bg-smoke">
+		<div class="row">
+			<div class="col-md-6 m">
+				
+				<br />
+				<div class="b red inline mr15" data-component="checkbox" data-component-path="todo.form.draft">@(This todo is draft)</div>
+			</div>
+			<div class="col-md-6">
+				<div data-component="pictureupload" data-component-path="todo.form.picture" data-width="800" data-height="400" data-icon="fa-camera" data-path="/download/{0}">@(Picture)</div>
+				<div class="help">@(Todo engine stores picture in 800x400px dimension.)</div>
+			</div>
+		</div>
+	</div>
+	<hr style="margin:0 0 8px" />
+	<div class="padding">
+		<ul class="tabmenu" data-component="tabmenu" data-component-path="todo.form.tab">
+			<li data-value="edit">@(Edit mode)</li>
+			<li data-value="preview">@(Preview)</li>
+		</ul>
+		<div data-component="visible" data-component-path="todo.form.tab" data-if="value === 'edit'" class="hidden">
+			<div data-component="codemirror" data-component-path="todo.form.body" data-type="markdown" data-height="100%" data-required="true" data-component-id="todo-body">@(Body)</div>
+			<div class="help"><i class="fa fa-cloud-upload mr5"></i>@(You can upload files via drag & drop.)</div>
+			<br />
+			<div data-component="textboxtags" data-component-path="todo.form.tags">@(Tags)</div>
+		</div>
+		<div data-component="visible" data-component-path="todo.form.tab" data-if="value === 'preview'" class="hidden markdown" id="todo-preview"></div>
+	</div>
+	<br />
+	<div data-component="error" data-component-path="todo.response"></div>
+	<div class="ui-form-buttons">
+		<div data-component="validation" data-component-path="todo.form">
+			<button name="submit">@(SUBMIT)</button>
+		</div>
+		<button name="cancel">@(Cancel)</button>
+	</div>
+</div>
+
+<script>
+
+	var todo = {};
+
+	todo.filter = {};
+	todo.filter.page = 1;
+	todo.grid = {};
+	todo.form = {};
+	todo.tags = [];
+	todo.templates = [];
+	todo.response = null;
+
+
+	ON('#todo.grid', function(component) {
+
+		// Max items per page
+		todo.filter.max = component.max;
+		todo_refresh_codelists();
+		todo_refresh(true);
+
+		component.click = function(index, row, button) {
+			switch ($(button).attr('name')) {
+				case 'edit':
+					todo_edit(row.id);
+					break;
+				case 'remove':
+					FIND('confirm').confirm('@(Do you want to remove) <b>{0}</b>?'.format(row.name), ['@(OK)', '@(Cancel)'], function(index) {
+						if (index)
+							return;
+						var loading = FIND('loading');
+						AJAX('DELETE {0}/api/todo/'.format(managerurl), { id: row.id }, function() {
+							if (isError(arguments))
+								return;
+							loading.hide(500);
+							todo_refresh();
+						});
+					});
+					break;
+			}
+		};
+	});
+
+	// Watch for changes in todo filter
+	WATCH('todo.filter.*', function(path, value) {
+		if (NOTMODIFIED('todo.filter', todo.filter))
+			return;
+		todo_refresh(path !== 'todo.filter.page');
+	});
+
+	ON('#todo.form', function(component) {
+		component.submit = function(hide) {
+			var loading = FIND('loading').show();
+			AJAX('POST {0}/api/todo/'.format(managerurl), todo.form, function(response) {
+
+				if (isError(arguments))
+					return;
+
+				loading.hide();
+
+				// Error handling
+				SET('todo.response', response);
+				if (response instanceof Array)
+					return;
+
+				hide();
+				todo_refresh();
+				success();
+			});
+		};
+	});
+
+	function todo_edit(id) {
+		var loading = FIND('loading').show();
+		AJAX('GET {0}/api/todo/{1}/'.format(managerurl, id), function(response) {
+
+			if (isError(arguments))
+				return;
+
+			loading.hide(500);
+
+			// Error prevention
+			if (response instanceof Array) {
+				FIND('message').warning(response[0].error);
+				return;
+			}
+
+			response.draft_old = response.draft;
+			SET('todo.form', $.extend({ $index: index, tab: 'edit' }, response), true);
+			SET('todo.response', null);
+			SET('common.form', 'todo');
+		});
+	}
+
+	function todo_new() {
+		SET('todo.form', { tab: 'edit', draft: true, draft_old: true, comments: true }, true);
+		SET('todo.response', null);
+		SET('common.form', 'todo');
+	}
+
+	// Method refreshes tags
+	function todo_refresh_codelists() {
+		AJAX('GET {0}/api/todo/codelists/'.format(managerurl), function(response) {
+
+			if (isError(arguments))
+				return;
+
+			SET('todo.tags', response.tags);
+		});
+	}
+	
+	// Method refreshes grid
+	function todo_refresh(reset) {
+
+		if (reset)
+			todo.filter.page = 1;
+
+		AJAX('GET {0}/api/todo/'.format(managerurl), todo.filter, function(response) {
+			SET('todo.grid', response);
+			var id = [];
+
+			response.items.forEach(function(item) {
+				!item.draft && id.push(item.id);
+			});
+
+			id.length && AJAXCACHE('POST {0}/api/todo/stats/'.format(managerurl), id, function(response) {
+				$('.todo-stats').each(function() {
+					var el = $(this);
+					var val = response[el.attr('data-id')];
+					val && el.html(Tangular.helpers.format(val));
+				});
+			}, '5 minute');
+		});
+	}
+
+	function todo_reload() {
+		var hash = location.hash;
+		hash && hash.length > 1 && setTimeout(function() {
+			todo_edit(hash.substring(1));
+		}, 500);
+	}
+
+	WATCH('todo.form.tab', function(path, value) {
+		if (value !== 'preview')
+			return;
+		AJAX('POST {0}/api/todo/preview/'.format(managerurl), { body: todo.form.body }, function(response) {
+			var el = $('#todo-preview');
+			el.html(response);
+			marked_video(el.find('.lang-video'));
+			marked_iframe(el.find('.lang-iframe'));
+			el.find('pre code').each(function(i, block) {
+				hljs.highlightBlock(block);
+			});
+		});
+	});
+
+	ON('#todo-body', function(component) {
+		var editor = component.codemirror();
+		editor.on('drop',function(editor, e) {
+
+			e.preventDefault();
+			e.stopPropagation();
+
+			SETTER('loading', 'show');
+
+			var data = new FormData();
+			var files = e.dataTransfer.files;
+
+			for (var i = 0, length = files.length; i < length; i++)
+				data.append('file' + i, files[i]);
+
+			UPLOAD('{0}/upload/markdown/'.format(managerurl), data, function(data, err) {
+
+				SETTER('loading', 'hide', 100);
+
+				if (err) {
+					if (err.toString().indexOf('413:') !== -1)
+						FIND('message').warning('@(The file is too large. The maximum allowed length of file is 2 MB.)');
+					return;
+				}
+
+				if (!data || data.length === 0)
+					return;
+
+				var push = [];
+
+				for (var i = 0, length = data.length; i < length; i++) {
+					var file = data[i];
+
+					if (file.width > 0 && file.height > 0) {
+						push.push('![' + file.filename + '](' + file.url + ')');
+						continue;
+					}
+
+					push.push('[' + file.filename + ' (' + (file.length / 1024).toFixed(2) + ' kB)](' + file.url + ')');
+				}
+
+				editor.replaceSelection(push.join('\n'));
+			});
+		});
+	});
+
+	function todo_reload() {
+		todo_refresh();
+	}
+
+</script>
