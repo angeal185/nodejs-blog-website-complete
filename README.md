@@ -31,5 +31,5 @@ Done
 /$manager/login
 
 user: admin
-password: password
+password: admin
 ```
