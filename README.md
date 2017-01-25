@@ -14,7 +14,6 @@ $ bower install
 
 --start dev
 
-$ gulp
 $ node debug.js 
 
 --or for production
